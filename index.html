@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" translate="no">
+<html lang="en" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <meta name="google" content="notranslate">
-    <title>Elementos del paisaje interior</title>
+    <title>Inland and Coastal Landscapes</title>
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/icono.ico">
     <style>
         /* ====== Reset & base ====== */
@@ -26,21 +26,16 @@
         body{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
-            min-height:100vh; 
-            display:flex; 
-            justify-content:center; 
-            align-items: flex-start; 
-            padding-top: 20px;
-            padding-bottom: 20px;
-            color:#333; 
+            min-height:100vh; color:#333; padding:10px;
+            display: block; 
         }
+
         .game-container{
             background:var(--white); border-radius:16px; box-shadow:0 12px 24px rgba(0,0,0,.12);
-            padding:1.2rem; max-width:980px; width:100%; min-height:640px; position:relative; overflow:hidden;
-            display:flex; flex-direction:column;
-            margin-bottom: 2rem; 
+            padding:1.2rem; max-width:980px; width:100%; min-height:600px; position:relative; overflow:hidden;
+            display:flex; flex-direction:column; margin: 20px auto;
         }
-        header{ text-align:center; margin-bottom:.8rem; margin-top:1.5rem; }
+        header{ text-align:center; margin-bottom:.8rem; margin-top:1rem; }
         h1{ color:var(--blue-dark); font-size:clamp(2rem,5.2vw,3.1rem); font-weight:900; letter-spacing:.5px; }
         .subtitle{ color:var(--blue-700); font-size:clamp(1rem,3.5vw,1.25rem); margin-top:.25rem; }
         .highlight-keyword{ color:var(--orange); font-weight:800; }
@@ -51,283 +46,200 @@
         .btn:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.12); }
         .btn:active{ transform:translateY(0); }
         .btn-primary{ background:var(--orange); }
-        .btn-primary:hover{ background:var(--orange-700); }
+        .btn-primary:hover{ background:var(--orange-700); color:#fff; }
         .btn-blue{ background:var(--blue-600); }
         .btn-blue:hover{ filter:brightness(.9); }
         .btn-ghost{ background:#e6f2ff; color:var(--blue-700); }
 
-        .screen{ display:none; animation:fadeIn .35s ease; flex-direction:column; flex:1; }
+        .screen{ display:none; animation:fadeIn .35s ease; flex-direction: column; flex:1;}
         .screen.active{ display:flex; }
         @keyframes fadeIn{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
 
+        .shake {
+            animation: doShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes doShake {
+            10%, 90% { transform: translate3d(-4px, 0, 0); }
+            20%, 80% { transform: translate3d(8px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
         .game-info{ display:flex; gap:.6rem; align-items:center; justify-content:space-between; margin:.4rem 0 1rem; flex-wrap:wrap; }
         .timer{ font-weight:900; color:var(--blue-700); font-size:clamp(.95rem,2.3vw,1.15rem); }
-        .progress-bar{ flex:1; height:10px; background:#e6f2ff; border-radius:999px; overflow:hidden; }
+        .progress-bar{ flex:1; height:10px; background:#e6f2ff; border-radius:999px; overflow:hidden; position: relative; }
         .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg, var(--orange) 0%, var(--orange-700) 100%); transition:width .3s ease; }
+        
+        .step-counter {
+            font-weight: 800;
+            color: var(--blue-700);
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            margin-left: 10px;
+            min-width: 40px;
+            text-align: right;
+        }
 
-        /* Pantalla Inicio */
         .start-content{ display:flex; flex-direction:column; justify-content:center; align-items:center; flex:1; gap:1rem; padding:1rem; }
         .advice-box{ background:var(--panel); border-left:4px solid var(--blue-700); padding:1rem 1.2rem; border-radius:12px;
             color:var(--blue-700); max-width:760px; text-align:center; font-size:clamp(1rem,3vw,1.15rem); }
-        .start-image{ max-width: 300px; width: 100%; margin: 0 auto; }
+        .start-image{ max-width: 300px; width: 100%; margin: 1.5rem auto 0; }
         
         .mute-btn{ position:absolute; top:.8rem; right:4.5rem; background:var(--orange); color:#fff; border:2px solid #fff; width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; z-index:20; }
         .mute-btn:hover{ background:var(--orange-700); }
 
-        /* Pantalla Resumen */
-        .theory-content { 
-            background-color: #f8f9fa; 
-            padding: 25px; 
-            border-radius: 15px; 
-            margin: 25px 0; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
-            border-left: 6px solid var(--blue); 
-        }
-        .system-item { 
-            margin-bottom: 15px; 
-            padding: 15px; 
-            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,245,255,0.9)); 
-            border-radius: 12px; 
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05); 
-            border-left: 4px solid var(--orange); 
-        }
-        .system-name { 
-            color: var(--blue); 
-            font-size: 1.2rem; 
-            font-weight: 800; 
-            margin-bottom: 5px; 
-            display: block; 
-        }
-        .sub-list { 
-            padding-left: 20px; 
-            margin-top: 5px; 
-            font-size: 0.95rem; 
-            color: #555; 
-        }
-        .sub-item { 
-            margin-bottom: 4px; 
-            list-style-type: disc; 
-        }
-
-        /* Juego 1 */
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-            justify-content: center;
-        }
-        @media (max-width: 600px) { 
-            .cards-container { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .memory-card { font-size: 0.8rem; padding: 10px; }
-        }
-
-        .memory-card {
-            background-color: #3498db; 
-            color: white;
-            border: 3px solid transparent;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-            text-align: center;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            user-select: none;
-        }
-        .memory-card:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .memory-card.selected { background-color: #f1c40f; transform: scale(1.05); color: white; }
-        .memory-card.matched { background-color: #27ae60; color: white; cursor: default; }
-        .memory-card.flash-error { animation: shakeRed 0.3s ease-in-out; }
-        @keyframes shakeRed {
-            0% { background-color: #3498db; transform: translateX(0); }
-            20% { background-color: #e74c3c; transform: translateX(-5px); }
-            40% { transform: translateX(5px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
-            100% { background-color: #3498db; transform: translateX(0); }
-        }
-
-        /* Juego 2 */
-        .game2-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            flex: 1;
-        }
+        /* --- JUEGO --- */
+        .board{ display:grid; grid-template-columns:1fr; gap:.8rem; align-items:start; }
         
-        .image-display {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: transparent; 
-            min-height: 300px;
-        }
-        .image-display img {
-            max-width: 100%;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 8px;
+        .panel{ background:#f8fbff; border:2px solid #d3e2ff; border-radius:12px; padding:.7rem .9rem; display:flex; align-items:center; justify-content:space-between; gap:.8rem; }
+        
+        .word-display-container{ display:flex; align-items:center; justify-content:center; gap:0.5rem; flex:1; }
+        .word-display{ font-size:clamp(1.2rem,4.5vw,1.8rem); font-weight:900; color:var(--blue-700); text-align:center; }
+        .btn-play-word{ background:var(--blue-600); color:#fff; border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background-color .2s; }
+        .btn-play-word:hover{ background:var(--blue-700); }
+        .btn-play-word svg{ width:20px; height:20px; }
+
+        .stage{ background:#fff; border-radius:12px; border:2px solid #e6f2ff; padding:.6rem; box-shadow: inset 0 0 0 1px #f3f7ff; position: relative;}
+        .img-wrap{ position:relative; width:100%; max-width:100%; margin:0 auto; user-select: none; -webkit-user-select: none;}
+        .img-wrap img{ display:block; width:100%; height:auto; border-radius:10px; user-select:none; -webkit-user-drag:none; }
+
+        .marker{
+            position:absolute;
+            background: transparent;
+            border: none;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display:flex; align-items:center; justify-content:center;
+            pointer-events:auto;
+            z-index: 10;
         }
 
-        /* Lista desplegable SIN SCROLL */
-        .custom-select-wrapper {
-            position: relative;
-            user-select: none;
-            width: 100%;
-            max-width: 400px;
-            z-index: 50;
+        .marker.flash-green {
+            animation: animFlashGreen 0.2s ease-in-out;
         }
-        .custom-select {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-        .custom-select__trigger {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.2rem;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--blue-700);
-            height: 50px;
-            line-height: 50px;
-            background: #fff;
-            border: 2px solid var(--blue-600);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .custom-select__trigger:hover {
-            border-color: var(--orange);
-        }
-        .custom-select__trigger::after {
-            content: '';
-            width: 10px; height: 10px;
-            border-right: 2px solid var(--blue-700);
-            border-bottom: 2px solid var(--blue-700);
-            transform: rotate(45deg);
-            margin-top: -5px;
-            transition: transform 0.2s;
-        }
-        .custom-select.open .custom-select__trigger::after {
-            transform: rotate(-135deg);
-            margin-top: 5px;
-        }
-        .custom-options {
-            position: absolute;
-            display: block;
-            top: 100%; 
-            left: 0;
-            right: 0;
-            background: #fff;
-            border: 2px solid var(--blue-600);
-            border-top: 0;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            z-index: 100;
-            height: auto; 
-            overflow: visible; 
-            transform: translateY(-10px);
-            transition: all 0.3s;
-        }
-        
-        .custom-select-wrapper.drop-up .custom-options {
-            top: auto;
-            bottom: 100%;
-            border-top: 2px solid var(--blue-600);
-            border-bottom: 0;
-            border-radius: 10px 10px 0 0;
-            transform: translateY(10px);
-        }
-        
-        .custom-select.open .custom-options {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: all;
-            transform: translateY(0);
-        }
-        .custom-option {
-            position: relative;
-            display: block;
-            padding: 0 1.2rem;
-            font-size: 1rem;
-            font-weight: 400;
-            color: var(--blue-700);
-            line-height: 45px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .custom-option:hover {
-            background-color: #e6f2ff;
-            color: var(--orange);
-        }
-        .custom-option.selected {
-            background-color: var(--panel);
-            color: var(--blue-dark);
-            font-weight: 700;
-        }
-        
-        .custom-select__trigger.correct {
-            border-color: var(--green);
-            background-color: rgba(46, 204, 113, 0.1);
-            color: var(--green);
-        }
-        .custom-select__trigger.wrong {
-            border-color: var(--red);
-            background-color: rgba(231, 76, 60, 0.1);
-            color: var(--red);
+        .marker.flash-red {
+            animation: animFlashRed 0.2s ease-in-out;
         }
 
-        .action-area {
-            height: 50px; 
-            display: flex; 
-            align-items: center;
-            justify-content: center;
+        @keyframes animFlashGreen {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+            50% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0.7); background-color: rgba(46, 204, 113, 0.3); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); background-color: transparent; }
         }
 
-        /* Pantalla Final */
+        @keyframes animFlashRed {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+            25% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0.7); background-color: rgba(231, 76, 60, 0.3); transform: translate(-50%, -50%) scale(1.1); }
+            75% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0.7); background-color: rgba(231, 76, 60, 0.3); transform: translate(-50%, -50%) scale(0.9); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); background-color: transparent; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .overlay-click{ position:absolute; inset:0; pointer-events: none; }
+
         .results{ display:flex; flex-direction:column; align-items:center; gap:.6rem; text-align:center; flex:1; justify-content:center;}
         .final-title{ color:var(--blue-dark); font-weight:900; }
         .big-score{ font-size:clamp(2.2rem,6vw,3.4rem); color:var(--blue-600); font-weight:900; }
         .score-title{ font-size:1.0rem; color:var(--blue-700); margin-top:1rem; }
         .final-time{ color:var(--blue-700); }
         
-        #trophyBox { display: none; font-size: clamp(4rem, 10vw, 7rem); margin: .5rem 0; text-align: center; align-self: center; animation: bounce 1s ease infinite; color: var(--orange); line-height: 1; }
-        @keyframes bounce { 0%,100%{ transform: translateY(0) scale(1); } 50%{ transform: translateY(-15px) scale(1.1); } }
+        #trophyBox { 
+            display: none; 
+            font-size: clamp(4rem, 10vw, 7rem);
+            margin: .5rem 0;
+            text-align: center;
+            align-self: center;
+            animation: bounce 1s ease infinite;
+            color: var(--orange);
+            line-height: 1; 
+        }
+        
+        @keyframes bounce { 
+            0%,100%{ transform: translateY(0) scale(1); } 
+            50%{ transform: translateY(-15px) scale(1.1); } 
+        }
         
         .credit{ color:var(--blue-700); margin-top:1rem; }
+        
         #finalMsg { font-size: clamp(1.2rem, 4.2vw, 1.8rem); font-weight: 800; color: var(--blue-700); margin-top: 0.6rem; }
+        
         .school-logo { display: block; width: 160px; max-width: 28%; height: auto; margin-top: 0.8rem; border-radius: 8px; object-fit: contain; }
         @media (max-width: 899px) { .school-logo { width: 140px; max-width: 160px; } }
         @media (max-width: 420px) { .school-logo { width: 110px; max-width: 40%; margin-top: 0.6rem; } }
 
+        .loading-indicator {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { color: white; font-size: 1.2rem; text-align: center; }
+
         /* --- ESTILOS DEL HALL OF FAME --- */
-        .hall-of-fame { background: var(--panel); border-radius: 12px; padding: 1rem; margin-top: 1.5rem; width: 100%; max-width: 600px; }
-        .hall-of-fame-title { color: var(--blue-700); font-weight: 800; font-size: 1.2rem; text-align: center; margin-bottom: 0.8rem; }
-        .hall-of-fame-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .hall-of-fame-table th { background: var(--blue-600); color: white; padding: 0.5rem; text-align: left; }
-        .hall-of-fame-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #ddd; }
-        .hall-of-fame-table tr:last-child td { border-bottom: none; }
-        .hall-of-fame-table tr:nth-child(even) { background-color: rgba(255, 255,255, 0.5); }
-        .hall-of-fame-error, .hall-of-fame-loading { padding: 1rem; text-align: center; color: var(--blue-700); font-style: italic; }
-        .hall-of-fame-error { color: var(--red); }
+        .hall-of-fame {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .hall-of-fame-title {
+            color: var(--blue-700);
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .hall-of-fame-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .hall-of-fame-table th {
+            background: var(--blue-600);
+            color: white;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .hall-of-fame-table td {
+            padding: 0.4rem 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .hall-of-fame-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .hall-of-fame-table tr:nth-child(even) {
+            background-color: rgba(255, 255,255, 0.5);
+        }
+
+        .hall-of-fame-error, .hall-of-fame-loading {
+            padding: 1rem;
+            text-align: center;
+            color: var(--blue-700);
+            font-style: italic;
+        }
+
+        .hall-of-fame-error {
+            color: var(--red);
+        }
 
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
         .modal-content { background:white; padding:2rem; border-radius:15px; width:90%; max-width:400px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3); }
@@ -335,26 +247,37 @@
         
         .confetti{ position:fixed; width:10px; height:10px; border-radius:50%; animation: confetti-fall 3s linear forwards; z-index:999; }
         @keyframes confetti-fall{ 0%{ transform:translate(0, -20px) rotate(0); opacity:1;} 100%{ transform:translate(var(--tx), var(--ty)) rotate(360deg); opacity:0; } }
+
+        @media (min-width:900px){ .board{ grid-template-columns: 300px 1fr; align-items:start; } .panel{ order:1; } .stage{ order:2; } }
+        @media (max-width:899px){
+            header{ margin-top:1.6rem; }
+            .board{ grid-template-columns:1fr; }
+            .panel{ display:flex; flex-direction:row; align-items:center; justify-content:space-between; padding:.6rem; }
+            .word-display-container{ order:0; width:100%; margin-bottom:.6rem; }
+            .stage{ order:1; }
+        }
+        @media (max-width:420px){ .btn{ min-width:110px; padding:.6rem .9rem; height:44px; } }
+
     </style>
 </head>
-<body>
-<div class="game-container">
+<body translate="no">
+
+<div class="game-container" translate="no">
     <button class="mute-btn" id="muteBtn" title="Silenciar/Activar sonido">🔊</button>
 
-    <!-- Pantalla de Inicio -->
-    <section class="screen active" id="startScreen">
+    <section class="screen active" id="startScreen" translate="no">
         <header>
-            <h1>Elementos del paisaje interior</h1>
-            <div class="subtitle">Identifica los siguientes elementos del relieve</div>
+            <h1>Inland and coastal landscapes</h1>
+            <div class="subtitle">Identify the elements of the inland and coastal landscapes</div>
         </header>
 
         <div class="start-content">
             <div class="advice-box">
-                <span class="advice-text">El relieve es la forma que presenta un territorio. Los principales elementos son: <span class="highlight-keyword">montaña, sierra, cordillera, valle, colina, llanura, meseta</span> y <span class="highlight-keyword">depresión</span>. ¡Identifícalos!</span>
-                <strong style="display:block; margin-top:0.5rem; text-align: center;">¡Ánimo!</strong>
+                <span class="advice-text">Listen to the audio and identify the elements of the <span class="highlight-keyword">inland</span> and <span class="highlight-keyword">coastal</span> landscapes. Press the play button to listen again.</span>
+                <strong style="display:block; margin-top:0.5rem; text-align:center;">Good luck!</strong>
             </div>
             
-            <button class="btn btn-primary" id="startBtn">Comenzar</button>
+            <button class="btn btn-primary" id="playBtn">Play</button>
             
             <img class="start-image" src="https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/refs/heads/main/Ni%C3%B1os.png" alt="Kids learning">
             
@@ -369,127 +292,101 @@
                             <th>Tiempo</th>
                         </tr>
                     </thead>
-                    <tbody id="hofTableBody"></tbody>
+                    <tbody id="hofTableBody">
+                      </tbody>
               </table>
             </div>
         </div>
     </section>
 
-    <!-- Pantalla Resumen -->
-    <section class="screen" id="summaryScreen">
+    <!-- JUEGO 1: INLAND -->
+    <section class="screen" id="gameScreen1" translate="no">
         <header>
-            <h1>El paisaje de interior</h1>
-        </header>
-        <div class="theory-content">
-            <div class="system-item">
-                <span class="system-name">Montaña</span>Elevaciones del terreno que acaban en una cima.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Sierra</span>Conjunto de montañas alineadas.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Cordillera</span>Conjunto de sierras.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Valle</span>Terreno entre dos montañas. Suele pasar un río.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Colina</span>Montaña de pequeño tamaño.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Llanura</span>Terreno plano sin elevaciones.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Meseta</span>Es una llanura elevada.
-            </div>
-            <div class="system-item">
-                <span class="system-name">Depresión</span>Es una llanura hundida.
-            </div>
-        </div>
-        <div style="text-align: center;">
-            <button class="btn btn-primary" id="playBtn">Jugar</button>
-        </div>
-    </section>
-
-    <!-- Pantalla Juego 1 -->
-    <section class="screen" id="game1Screen">
-        <header>
-            <h1>Empareja las tarjetas</h1>
+            <h1>Identify the elements of the inland landscapes ⛰️</h1>
         </header>
         <div class="game-info">
             <div class="timer" id="timerGame1">00:00.0</div>
             <div class="progress-bar"><div class="progress-fill" id="progressFillGame1"></div></div>
-            <div class="timer" style="font-size:0.9rem;">Intentos: <span id="attemptsGame1">0</span></div>
+            <div class="step-counter" id="stepCounter1">0/8</div>
         </div>
-        <div class="cards-container" id="cardsContainerGame1"></div>
+
+        <div class="board">
+            <div class="panel">
+                <div class="word-display-container">
+                    <div class="word-display" id="wordDisplay1">...</div>
+                    <button class="btn-play-word" id="playWordBtn1" title="Play audio" aria-label="Play audio">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5v14l11-7z" fill="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="stage">
+                <div class="img-wrap" id="imgWrap1">
+                    <img id="bodyImg1" src="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Interior.png" alt="Inland landscape to identify parts">
+                    <div class="overlay-click" id="overlayClick1" aria-hidden="true"></div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <!-- Pantalla Juego 2 -->
-    <section class="screen" id="game2Screen">
+    <!-- JUEGO 2: COASTAL -->
+    <section class="screen" id="gameScreen2" translate="no">
         <header>
-            <h1>Identifica los elementos del relieve</h1>
+            <h1>Identify the elements of the coastal landscapes 🌊</h1>
         </header>
         <div class="game-info">
             <div class="timer" id="timerGame2">00:00.0</div>
             <div class="progress-bar"><div class="progress-fill" id="progressFillGame2"></div></div>
-            <div class="timer" style="font-size:0.9rem;">Nivel <span id="levelIndicator">1</span>/8</div>
+            <div class="step-counter" id="stepCounter2">0/8</div>
         </div>
 
-        <div class="game2-container">
-            <div class="image-display">
-                <!-- Imagen JS -->
-                <img src="" alt="Elemento del relieve" id="game2Img">
-            </div>
-
-            <div class="custom-select-wrapper drop-up">
-                <div class="custom-select" id="customSelect">
-                    <div class="custom-select__trigger"><span>Elementos del relieve</span></div>
-                    <div class="custom-options">
-                        <span class="custom-option" data-value="Montaña">Montaña</span>
-                        <span class="custom-option" data-value="Sierra">Sierra</span>
-                        <span class="custom-option" data-value="Cordillera">Cordillera</span>
-                        <span class="custom-option" data-value="Valle">Valle</span>
-                        <span class="custom-option" data-value="Colina">Colina</span>
-                        <span class="custom-option" data-value="Llanura">Llanura</span>
-                        <span class="custom-option" data-value="Meseta">Meseta</span>
-                        <span class="custom-option" data-value="Depresión">Depresión</span>
-                    </div>
+        <div class="board">
+            <div class="panel">
+                <div class="word-display-container">
+                    <div class="word-display" id="wordDisplay2">...</div>
+                    <button class="btn-play-word" id="playWordBtn2" title="Play audio" aria-label="Play audio">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5v14l11-7z" fill="currentColor"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="action-area">
-                <button class="btn btn-primary" id="checkBtn">Comprobar</button>
-                <button class="btn btn-primary" id="continueBtn" style="display:none;">Continuar</button>
+            <div class="stage">
+                <div class="img-wrap" id="imgWrap2">
+                    <img id="bodyImg2" src="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20Costa/Costa.png" alt="Coastal landscape to identify parts">
+                    <div class="overlay-click" id="overlayClick2" aria-hidden="true"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Pantalla Final -->
-    <section class="screen" id="finalScreen">
+    <section class="screen" id="finalScreen" translate="no">
         <header>
-            <h1 class="final-title">Elementos del relieve interior</h1>
+            <h1 class="final-title">Inland and coastal landscapes</h1>
         </header>
         <div class="results">
             <div id="trophyBox">🏆</div>
             
-            <div class="score-title">Puntuación:</div>
+            <div class="score-title">Score:</div>
             <div class="big-score" id="finalScore">0</div>
-            <div class="final-time">Tiempo: <span id="finalTime">00:00.0</span></div>
+            <div class="final-time">Time: <span id="finalTime">00:00.0</span></div>
             <div id="finalMsg" class="subtitle"></div>
-            <button class="btn btn-primary" id="backToMenuBtn" style="background:var(--orange);">Volver al menú</button>
-            <span class="credit">Creado por Manuel J. Ventura</span>
+            <button class="btn btn-primary" id="backToMenuBtn" style="background:var(--orange);">Back to menu</button>
+            <span class="credit">Created by Manuel J. Ventura</span>
             <img class="school-logo" src="https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/refs/heads/main/Siurot.png" alt="School logo" />
         </div>
     </section>
 </div>
 
-<!-- Modal de Envío de Puntuación -->
 <div id="submitModal" class="modal-overlay">
     <div class="modal-content">
-        <h3>¡Juego Terminado!</h3>
-        <p>Tu tiempo: <span id="modalTime">00:00.0</span></p>
-        <input type="text" id="playerName" class="modal-input" placeholder="Nombre" maxlength="15">
-        <input type="text" id="playerSurname" class="modal-input" placeholder="Apellido" maxlength="20">
+        <h3>Game Over!</h3>
+        <p>Your time: <span id="modalTime">00:00.0</span></p>
+        <input type="text" id="playerName" class="modal-input" placeholder="Name" maxlength="15">
+        <input type="text" id="playerSurname" class="modal-input" placeholder="Surname" maxlength="20">
         <div style="display: flex; gap: 10px; justify-content: center;">
             <button id="submitScoreBtn" class="btn btn-primary">Guardar</button>
             <button id="discardScoreBtn" class="btn btn-ghost">Cancelar</button>
@@ -497,24 +394,37 @@
     </div>
 </div>
 
+<div class="loading-indicator" id="loadingIndicator" style="display: none;">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading audios...</div>
+</div>
+
 <script>
-    /* --- 1. CONFIGURACIÓN DE VARIABLES GLOBALES (CRÍTICO) --- */
-    const SHEET_NAME = "Interior";
+    /* --- 1. CONFIGURACIÓN DE VARIABLES GLOBALES --- */
+    const SHEET_NAME = "Inland";
     const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAyHMXyc0aZafOMXQtfQ3YztUTDToN7D8jm62ESrLJwDEj_rdWfgryi7clcgW1ednZ/exec";
     
     let soundEnabled = true;
     let audioUnlocked = false;
     let isMuted = false;
+    let audiosPrecargados = false;
+    let pendingAudioTimeout = null;
+    let currentWordAudio = null;
 
     let startTime = 0;
     let timerInterval = null;
     let elapsed = 0;
-    let finalTimeVal = 0;
+    
     let finalScoreVal = 0;
-
-    // Contadores de intentos
+    let finalTimeVal = 0;
+    
+    // Estadísticas por juego
     let attemptsGame1 = 0;
     let attemptsGame2 = 0;
+    let successGame1 = 0;
+    let successGame2 = 0; 
+
+    const totalTargets = 8;
 
     /* --- AUDIOS --- */
     const audioUrls = {
@@ -533,30 +443,34 @@
         audioObjects[key] = a; 
     });
 
-    /* --- DATOS DEL JUEGO --- */
-    const game1Data = [
-        { id: 1, term: 'Montaña', def: 'Elevaciones del terreno que acaban en una cima', pairId: 1 },
-        { id: 2, term: 'Sierra', def: 'Conjunto de montañas alineadas', pairId: 2 },
-        { id: 3, term: 'Cordillera', def: 'Conjunto de sierras', pairId: 3 },
-        { id: 4, term: 'Valle', def: 'Terreno entre dos montañas. Suele pasar un río', pairId: 4 },
-        { id: 5, term: 'Colina', def: 'Montaña de pequeño tamaño', pairId: 5 },
-        { id: 6, term: 'Llanura', def: 'Terreno plano sin elevaciones', pairId: 6 },
-        { id: 7, term: 'Meseta', def: 'Es una llanura elevada', pairId: 7 },
-        { id: 8, term: 'Depresión', def: 'Es una llanura hundida', pairId: 8 }
+    const ORIGINAL_W = 1248;
+    const ORIGINAL_H = 832;
+    
+    // AUDIOS CORREGIDOS A RAW
+    const game1Targets = [
+        { cx: 118, cy: 192, r: 66, word: 'Mountain', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Mauntain.mp3' },
+        { cx: 448, cy: 152, r: 66, word: 'Mountain range', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Mountain_range.mp3' },
+        { cx: 1031, cy: 111, r: 66, word: 'Mountain chain', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Mountain_chain.mp3' },
+        { cx: 1152, cy: 476, r: 66, word: 'Hill', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/hill.mp3' },
+        { cx: 653, cy: 385, r: 66, word: 'Plain', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Plain.mp3' },
+        { cx: 180, cy: 446, r: 66, word: 'Plateau', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Plateau.mp3' },
+        { cx: 969, cy: 712, r: 66, word: 'Depression', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Depression.mp3' },
+        { cx: 775, cy: 112, r: 66, word: 'Valley', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Valley.mp3' }
     ];
 
-    const game2Data = [
-        { type: 'Montaña', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Montana.png' },
-        { type: 'Sierra', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Sierra.png' },
-        { type: 'Cordillera', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Cordillera.png' },
-        { type: 'Valle', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Valle.png' },
-        { type: 'Colina', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Colina.png' },
-        { type: 'Llanura', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Llanura.png' },
-        { type: 'Meseta', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Meseta.png' },
-        { type: 'Depresión', img: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Elementos%20interior/Depresion.png' }
+    const game2Targets = [
+        { cx: 353, cy: 557, r: 66, word: 'Cape', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Cape.mp3' },
+        { cx: 908, cy: 131, r: 66, word: 'Cliff', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Cliff.mp3' },
+        { cx: 742, cy: 546, r: 66, word: 'Island', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Island.mp3' },
+        { cx: 1031, cy: 376, r: 66, word: 'Peninsula', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Peninsula.mp3' },
+        { cx: 1154, cy: 173, r: 66, word: 'Archipelago', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Archipelago.mp3' },
+        { cx: 474, cy: 401, r: 66, word: 'Gulf', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Gulf.mp3' },
+        { cx: 428, cy: 713, r: 66, word: 'Bay', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Bay.mp3' },
+        { cx: 706, cy: 234, r: 66, word: 'Inlet', audio: 'https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/Relieve_Paisaje/Audio_Landscapes/Inlet.mp3' }
     ];
 
-    /* --- FUNCIONES DE AUDIO --- */
+    const wordAudios = {};
+
     function unlockAudio() {
         if (audioUnlocked) return;
         try {
@@ -570,7 +484,7 @@
     }
 
     function playSound(type) {
-        if (!soundEnabled || isMuted) return;
+        if (isMuted) return;
         if (!audioUnlocked) unlockAudio();
         const a = audioObjects[type];
         if(!a) return;
@@ -578,9 +492,89 @@
     }
 
     function toggleSound() {
-        soundEnabled = !soundEnabled;
-        isMuted = !soundEnabled;
-        document.getElementById('muteBtn').textContent = soundEnabled ? '🔊' : '🔇';
+        isMuted = !isMuted;
+        document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🔊';
+        if (isMuted && currentWordAudio) { currentWordAudio.pause(); currentWordAudio.currentTime = 0; }
+    }
+
+    function preloadAllAudios() {
+        console.log("Precargando audios...");
+        let loadedCount = 0;
+        let errorCount = 0;
+        const allTargets = [...game1Targets, ...game2Targets];
+
+        return new Promise((resolve) => {
+            if (!allTargets || allTargets.length === 0) {
+                audiosPrecargados = true;
+                resolve();
+                return;
+            }
+            
+            allTargets.forEach((pair) => {
+                try {
+                    const audio = new Audio();
+                    audio.src = pair.audio;
+                    audio.preload = 'auto';
+                    audio.crossOrigin = 'anonymous';
+                    audio.addEventListener('canplaythrough', () => {
+                        loadedCount++;
+                        if (loadedCount + errorCount === allTargets.length) {
+                            audiosPrecargados = true;
+                            resolve();
+                        }
+                    }, { once: true });
+                    audio.addEventListener('error', (e) => {
+                        errorCount++;
+                        console.error("Error loading audio:", pair.audio);
+                        if (loadedCount + errorCount === allTargets.length) {
+                            audiosPrecargados = true;
+                            resolve();
+                        }
+                    }, { once: true });
+                    wordAudios[pair.word] = audio;
+                } catch(e) {
+                    errorCount++;
+                    if (loadedCount + errorCount === allTargets.length) {
+                        audiosPrecargados = true;
+                        resolve();
+                    }
+                }
+            });
+        });
+    }
+
+    function playWordAudio(word, delay = 0) {
+        if (pendingAudioTimeout) { clearTimeout(pendingAudioTimeout); pendingAudioTimeout = null; }
+        if (isMuted) return;
+        if (!audioUnlocked) unlockAudio();
+        
+        const audio = wordAudios[word];
+        if (!audio) {
+            console.error(`No audio found for "${word}"`);
+            return;
+        }
+        try {
+            if (currentWordAudio && !currentWordAudio.paused && currentWordAudio !== audio) {
+                currentWordAudio.pause();
+                currentWordAudio.currentTime = 0;
+            }
+            currentWordAudio = audio;
+            const playAudio = () => {
+                try {
+                    audio.currentTime = 0;
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error=>{
+                            console.error(`Error playing "${word}":`, error);
+                        });
+                    }
+                } catch(e) { console.error('Error in playAudio:', e); }
+            };
+            if (delay > 0) pendingAudioTimeout = setTimeout(playAudio, delay);
+            else playAudio();
+        } catch(e) {
+            console.error('Error trying to play audio:', e);
+        }
     }
 
     /* --- LÓGICA GENERAL --- */
@@ -622,195 +616,209 @@
         return `${m}:${s}.${ms}`;
     }
 
-    /* --- FLUJO PRINCIPAL --- */
-    document.getElementById('startBtn').onclick = () => { 
-        playSound('tap'); 
-        showScreen('summaryScreen'); 
-    };
-    
-    document.getElementById('playBtn').onclick = () => { 
-        playSound('tap'); 
+    /* --- INICIO JUEGO --- */
+    async function startGame() {
+        playSound('tap');
         startGlobalTimer();
-        initGame1();
-    };
-
-    /* --- JUEGO 1: EMPAREJAR --- */
-    let selectedCards = [];
-    let matchesFound = 0;
-    const totalPairs1 = 8;
-
-    function initGame1() {
-        showScreen('game1Screen');
-        attemptsGame1 = 0;
-        document.getElementById('attemptsGame1').textContent = '0';
-        matchesFound = 0;
-        selectedCards = [];
-        updateProgress('progressFillGame1', 0);
         
-        const container = document.getElementById('cardsContainerGame1');
-        container.innerHTML = '';
+        const loading = document.getElementById('loadingIndicator');
+        loading.style.display = 'flex';
         
-        let cards = [];
-        game1Data.forEach(p => { cards.push(p.term, p.def); });
-        cards.sort(() => Math.random() - 0.5);
-
-        cards.forEach(text => {
-            const card = document.createElement('div');
-            card.className = 'memory-card';
-            card.textContent = text;
-            card.onclick = () => selectCard(card);
-            container.appendChild(card);
-        });
-    }
-
-    function selectCard(card) {
-        if (card.classList.contains('matched') || selectedCards.length >= 2 || selectedCards.includes(card)) return;
+        showScreen('gameScreen1'); 
         
-        playSound('tap');
-        card.classList.add('selected');
-        selectedCards.push(card);
-
-        if (selectedCards.length === 2) {
-            attemptsGame1++;
-            document.getElementById('attemptsGame1').textContent = attemptsGame1;
-
-            const c1 = selectedCards[0];
-            const c2 = selectedCards[1];
-            const pair1 = game1Data.find(p => p.term === c1.textContent);
-            const pair2 = game1Data.find(p => p.term === c2.textContent);
-
-            let isMatch = false;
-            if (pair1 && pair1.def === c2.textContent) isMatch = true;
-            else if (pair2 && pair2.def === c1.textContent) isMatch = true;
-
-            if (isMatch) {
-                playSound('correct');
-                c1.classList.remove('selected'); c2.classList.remove('selected');
-                c1.classList.add('matched'); c2.classList.add('matched');
-                matchesFound++;
-                updateProgress('progressFillGame1', (matchesFound / totalPairs1) * 100);
-                selectedCards = [];
-                if (matchesFound === totalPairs1) {
-                    setTimeout(() => {
-                        initGame2();
-                    }, 1000);
-                }
-            } else {
-                playSound('error');
-                c1.classList.remove('selected'); c2.classList.remove('selected');
-                c1.classList.add('flash-error'); c2.classList.add('flash-error');
-                selectedCards = [];
-                setTimeout(() => {
-                    c1.classList.remove('flash-error');
-                    c2.classList.remove('flash-error');
-                }, 300);
+        try {
+            if (!audiosPrecargados) {
+                await preloadAllAudios();
             }
+        } catch (e) {
+            console.error(e);
         }
+        
+        initGame(1);
+        loading.style.display = 'none';
     }
 
-    /* --- JUEGO 2: SELECCIONAR --- */
-    let game2Items = [];
-    let currentIndex2 = 0;
-    let currentSelection = null;
-    const totalItems2 = 8;
+    /* --- LÓGICA JUEGO INDIVIDUAL --- */
+    let currentGame = 1; 
+    let playOrder = [];         
+    let playIndex = 0;          
+    let answered = new Set();
+    let markers = [];
     
-    const customSelect = document.querySelector('.custom-select');
-    const selectTrigger = document.querySelector('.custom-select__trigger');
-    const customOptions = document.querySelectorAll('.custom-option');
-    const game2Img = document.getElementById('game2Img');
-    const checkBtn = document.getElementById('checkBtn');
-    const continueBtn = document.getElementById('continueBtn');
+    const el = (id)=>document.getElementById(id);
 
-    selectTrigger.addEventListener('click', function() {
-        customSelect.classList.toggle('open');
-        playSound('tap');
-    });
-
-    window.addEventListener('click', function(e) {
-        if (!customSelect.contains(e.target)) {
-            customSelect.classList.remove('open');
-        }
-    });
-
-    customOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            if(!customSelect.classList.contains('open')) return;
-            
-            customSelect.classList.remove('open');
-            selectTrigger.innerHTML = this.textContent;
-            customSelect.classList.add('selected'); 
-            currentSelection = this.getAttribute('data-value');
-            
-            selectTrigger.classList.remove('correct', 'wrong');
-        });
-    });
-
-    checkBtn.addEventListener('click', checkAnswerGame2);
-    continueBtn.addEventListener('click', nextLevelGame2);
-
-    function initGame2() {
-        showScreen('game2Screen');
-        attemptsGame2 = 0;
-        currentIndex2 = 0;
-        updateProgress('progressFillGame2', 0);
+    function initGame(gameNum) {
+        currentGame = gameNum;
+        markers.forEach(m=>m.remove()); 
+        markers = [];
         
-        game2Items = shuffle([...game2Data]);
-        loadQuestionGame2();
+        const targets = (gameNum === 1) ? game1Targets : game2Targets;
+        const imgId = (gameNum === 1) ? 'bodyImg1' : 'bodyImg2';
+        const wrapId = (gameNum === 1) ? 'imgWrap1' : 'imgWrap2';
+
+        placeMarkers(targets, el(imgId), el(wrapId));
+        beginPlay(targets, gameNum);
     }
 
-    function loadQuestionGame2() {
-        const item = game2Items[currentIndex2];
-        game2Img.src = item.img;
-        
-        document.getElementById('levelIndicator').textContent = currentIndex2 + 1;
-        
-        selectTrigger.innerHTML = '<span>Elementos del relieve</span>';
-        selectTrigger.classList.remove('selected', 'correct', 'wrong');
-        currentSelection = null;
-        checkBtn.style.display = 'inline-flex';
-        continueBtn.style.display = 'none';
-    }
+    function placeMarkers(targets, imgEl, wrapEl){
+        markers.forEach(m=>m.remove()); markers = [];
 
-    function checkAnswerGame2() {
-        if (!currentSelection) {
-            alert("Por favor, selecciona una opción.");
+        const rect = imgEl.getBoundingClientRect();
+        if(rect.width === 0) {
+            setTimeout(() => placeMarkers(targets, imgEl, wrapEl), 200);
             return;
         }
 
-        const correctType = game2Items[currentIndex2].type;
-        attemptsGame2++;
+        const scaleX = rect.width / ORIGINAL_W;
+        const scaleY = rect.height / ORIGINAL_H;
 
-        if (currentSelection === correctType) {
+        targets.forEach((p, idx)=>{
+            const cx = p.cx * scaleX;
+            const cy = p.cy * scaleY;
+            const r = p.r * scaleX; 
+
+            const div = document.createElement('div');
+            div.className = 'marker';
+            
+            div.style.left = cx + 'px';
+            div.style.top  = cy + 'px';
+            div.style.width = (r * 2) + 'px';
+            div.style.height = (r * 2) + 'px';
+            
+            div.dataset.idx = idx;
+            div.tabIndex = 0;
+            div.setAttribute('role','button');
+            div.addEventListener('click', function(e) {
+                onMarkerClick.call(this, e, targets);
+            });
+            wrapEl.appendChild(div);
+            markers.push(div);
+        });
+    }
+
+    function refreshMarkersStyles(targets, imgEl){
+        const rect = imgEl.getBoundingClientRect();
+        if(rect.width === 0) return;
+        const scaleX = rect.width / ORIGINAL_W;
+        const scaleY = rect.height / ORIGINAL_H;
+
+        markers.forEach((div)=>{
+            const idx = +div.dataset.idx; const p = targets[idx];
+            const cx = p.cx * scaleX;
+            const cy = p.cy * scaleY;
+            const r = p.r * scaleX;
+
+            div.style.left = cx + 'px';
+            div.style.top  = cy + 'px';
+            div.style.width = (r * 2) + 'px';
+            div.style.height = (r * 2) + 'px';
+        });
+    }
+
+    function beginPlay(targets, gameNum){
+        playOrder = shuffle([...Array(targets.length).keys()]);
+        playIndex = 0;
+        answered.clear();
+        
+        const progId = (gameNum === 1) ? 'progressFillGame1' : 'progressFillGame2';
+        const countId = (gameNum === 1) ? 'stepCounter1' : 'stepCounter2';
+        
+        updateProgress(progId, 0); 
+        updateStepCounter(countId, 0);
+        
+        markers.forEach(m=> m.classList.remove('flash-green','flash-red'));
+        
+        playWordAudioByIndex(playOrder[playIndex], targets, gameNum);
+    }
+
+    function playWordAudioByIndex(i, targets, gameNum){
+        if (typeof i === 'undefined' || i === null) return;
+        const pair = targets[i];
+        if(!pair) return;
+        
+        const displayId = (gameNum === 1) ? 'wordDisplay1' : 'wordDisplay2';
+        const displayEl = el(displayId);
+        if(displayEl) displayEl.textContent = pair.word;
+        
+        playWordAudio(pair.word, 500); 
+    }
+
+    function onMarkerClick(e, targets){
+        const gameNum = currentGame;
+        const imgWrapId = (gameNum === 1) ? 'imgWrap1' : 'imgWrap2';
+        const imgWrap = el(imgWrapId);
+
+        const idxClicked = +this.dataset.idx;
+        const currentIdx = playOrder[playIndex];
+        
+        if(answered.has(currentIdx)) return;
+
+        if (currentWordAudio) { currentWordAudio.pause(); currentWordAudio.currentTime = 0; currentWordAudio = null; }
+        if (pendingAudioTimeout) { clearTimeout(pendingAudioTimeout); pendingAudioTimeout = null; }
+
+        if(idxClicked === currentIdx){
+            if(gameNum === 1) attemptsGame1++;
+            else attemptsGame2++;
+
+            this.classList.add('flash-green');
             playSound('correct');
-            selectTrigger.classList.remove('wrong');
-            selectTrigger.classList.add('correct');
             
             setTimeout(() => {
-                nextLevelGame2();
+                this.classList.remove('flash-green');
             }, 200);
-            
-        } else {
-            playSound('error');
-            selectTrigger.classList.remove('correct');
-            selectTrigger.classList.add('wrong');
-            
-            document.querySelector('.custom-select-wrapper').classList.add('shake');
-            setTimeout(() => document.querySelector('.custom-select-wrapper').classList.remove('shake'), 400);
 
-            checkBtn.style.display = 'none';
-            continueBtn.style.display = 'inline-flex';
+            answered.add(currentIdx); 
+            
+            const progId = (gameNum === 1) ? 'progressFillGame1' : 'progressFillGame2';
+            const countId = (gameNum === 1) ? 'stepCounter1' : 'stepCounter2';
+            
+            updateProgress(progId, (answered.size/totalTargets)*100);
+            updateStepCounter(countId, answered.size);
+
+            if(answered.size === totalTargets) { 
+                if(gameNum === 1) {
+                    successGame1 = totalTargets;
+                    setTimeout(() => {
+                        showScreen('gameScreen2');
+                        initGame(2);
+                    }, 800);
+                } else {
+                    successGame2 = totalTargets;
+                    setTimeout(finishGame, 500); 
+                }
+            } else {
+                playIndex++;
+                playWordAudioByIndex(playOrder[playIndex], targets, gameNum);
+            }
+        } else {
+            if(gameNum === 1) attemptsGame1++;
+            else attemptsGame2++;
+
+            this.classList.add('flash-red');
+            playSound('error');
+            
+            setTimeout(() => {
+                this.classList.remove('flash-red');
+            }, 200);
+
+            imgWrap.classList.remove('shake');
+            void imgWrap.offsetWidth; 
+            imgWrap.classList.add('shake');
+            
+            playWordAudioByIndex(currentIdx, targets, gameNum);
         }
     }
 
-    function nextLevelGame2() {
-        currentIndex2++;
-        updateProgress('progressFillGame2', (currentIndex2 / totalItems2) * 100);
+    function shuffle(a){ const arr=[...a]; for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
 
-        if (currentIndex2 < totalItems2) {
-            loadQuestionGame2();
-        } else {
-            finishGame();
-        }
+    function updateStepCounter(id, count) {
+        const counter = el(id);
+        if(counter) counter.textContent = `${count}/${totalTargets}`;
+    }
+
+    function updateProgress(id, pct) {
+        const fill = el(id);
+        if(fill) fill.style.width = pct + '%';
     }
 
     /* --- FINALIZAR --- */
@@ -818,62 +826,32 @@
         stopTimer();
         finalTimeVal = elapsed;
         
-        let ratio1 = attemptsGame1 > 0 ? (8 / attemptsGame1) : 0;
-        let ratio2 = attemptsGame2 > 0 ? (8 / attemptsGame2) : 0;
-        finalScoreVal = Math.round(((ratio1 + ratio2) / 2) * 100);
+        let ratio1 = (successGame1 > 0 && attemptsGame1 > 0) ? (successGame1 / attemptsGame1) : 0;
+        let ratio2 = (successGame2 > 0 && attemptsGame2 > 0) ? (successGame2 / attemptsGame2) : 0;
+        
+        let scoreCalc = Math.round(((ratio1 + ratio2) / 2) * 100);
 
-        document.getElementById('finalScore').textContent = finalScoreVal;
-        document.getElementById('finalTime').textContent = formatTime(finalTimeVal);
+        finalScoreVal = scoreCalc;
 
-        const trophyBox = document.getElementById('trophyBox');
-        const msg = document.getElementById('finalMsg');
+        el('finalScore').textContent = finalScoreVal;
+        el('finalTime').textContent = formatTime(finalTimeVal);
+
+        const trophyBox = el('trophyBox');
+        const msg = el('finalMsg');
         
         if (finalScoreVal === 100) {
             trophyBox.style.display = 'block';
-            msg.textContent = '¡Enhorabuena, puntuación máxima!';
+            msg.textContent = 'Well done, full marks!';
             playSound('victory');
             createConfetti();
         } else {
             trophyBox.style.display = 'none';
-            msg.textContent = '¡Buen trabajo! Sigue practicando';
+            msg.textContent = 'Good job! Keep practising!';
             playSound('completed');
         }
 
         showScreen('finalScreen');
         showSubmitModal(finalTimeVal, finalScoreVal);
-    }
-
-    function updateProgress(id, pct) {
-        document.getElementById(id).style.width = pct + '%';
-    }
-
-    function shuffle(array) {
-        let currentIndex = array.length, randomIndex;
-        while (currentIndex != 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-        }
-        return array;
-    }
-
-    /* --- EFECTOS VISUALES --- */
-    function createConfetti() {
-        for(let i=0;i<100;i++){
-            setTimeout(()=>{
-                const c = document.createElement('div');
-                c.className = 'confetti';
-                const x = Math.random() * window.innerWidth;
-                const tx = (Math.random() - 0.5) * 200;
-                c.style.left = x + 'px';
-                c.style.top = '-10px';
-                c.style.backgroundColor = ['#ff595e','#1982c4','#6a4c93','#ffca3a','#8ac926'][Math.floor(Math.random()*5)];
-                c.style.setProperty('--tx', tx + 'px');
-                c.style.setProperty('--ty', window.innerHeight + 20 + 'px');
-                document.body.appendChild(c);
-                setTimeout(() => c.remove(), 3000);
-            }, i * 20);
-        }
     }
 
     /* --- HALL OF FAME --- */
@@ -883,24 +861,13 @@
         if (isHofLoading) return;
         isHofLoading = true;
 
-        const tbody = document.getElementById('hofTableBody');
+        const tbody = el('hofTableBody');
         tbody.innerHTML = '<tr><td colspan="4" class="hall-of-fame-loading">Cargando datos...</td></tr>';
 
         const url = `${APP_SCRIPT_URL}?action=read&sheet=${SHEET_NAME}`;
 
-        const timeoutId = setTimeout(() => {
-            if(isHofLoading) {
-                tbody.innerHTML = '<tr><td colspan="4" class="hall-of-fame-error">Error de conexión (Timeout).</td></tr>';
-                isHofLoading = false;
-            }
-        }, 8000);
-
         fetch(url)
-            .then(r => {
-                clearTimeout(timeoutId);
-                if(!r.ok) throw new Error("Network response was not ok");
-                return r.json();
-            })
+            .then(r => r.json())
             .then(data => {
                 if (data.status === 'success' && data.data) {
                     
@@ -961,11 +928,10 @@
                     }
 
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" class="hall-of-fame-error">Error de datos.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="hall-of-fame-error">Error de conexión.</td></tr>';
                 }
             })
             .catch(e => {
-                clearTimeout(timeoutId);
                 console.error("Error HoF:", e);
                 tbody.innerHTML = '<tr><td colspan="4" class="hall-of-fame-error">Error de conexión.</td></tr>';
             })
@@ -975,20 +941,20 @@
     }
 
     function showSubmitModal(time, score) {
-        document.getElementById('modalTime').textContent = formatTime(time);
-        document.getElementById('playerName').value = '';
-        document.getElementById('playerSurname').value = '';
-        document.getElementById('submitModal').style.display = 'flex';
-        const btn = document.getElementById('submitScoreBtn');
+        el('modalTime').textContent = formatTime(time);
+        el('playerName').value = '';
+        el('playerSurname').value = '';
+        el('submitModal').style.display = 'flex';
+        const btn = el('submitScoreBtn');
         btn.textContent = "Guardar";
         btn.disabled = false;
-        document.getElementById('playerName').focus();
+        el('playerName').focus();
     }
 
     function handleSubmitScore() {
-        const btn = document.getElementById('submitScoreBtn');
-        const nameInput = document.getElementById('playerName');
-        const surnameInput = document.getElementById('playerSurname');
+        const btn = el('submitScoreBtn');
+        const nameInput = el('playerName');
+        const surnameInput = el('playerSurname');
         
         playSound('tap');
 
@@ -1011,7 +977,7 @@
                 body: JSON.stringify({ sheet: SHEET_NAME, action: 'write', data: payload })
             })
             .then(() => {
-                document.getElementById('submitModal').style.display = 'none';
+                el('submitModal').style.display = 'none';
                 btn.textContent = originalText;
                 btn.disabled = false;
                 setTimeout(loadHallOfFame, 1500);
@@ -1027,30 +993,89 @@
         }
     }
 
-    document.getElementById('submitScoreBtn').onclick = handleSubmitScore;
+    el('submitScoreBtn').onclick = handleSubmitScore;
 
-    document.getElementById('discardScoreBtn').onclick = () => { 
-        document.getElementById('submitModal').style.display = 'none'; 
+    el('discardScoreBtn').onclick = () => { 
+        el('submitModal').style.display = 'none'; 
     };
 
-    document.getElementById('playerName').addEventListener('keypress', function (e) {
+    el('playerName').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
-            document.getElementById('playerSurname').focus();
+            el('playerSurname').focus();
         }
     });
 
-    document.getElementById('playerSurname').addEventListener('keypress', function (e) {
+    el('playerSurname').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             handleSubmitScore();
         }
     });
 
-    document.getElementById('backToMenuBtn').onclick = () => { 
-        playSound('tap'); 
-        location.reload(); 
-    };
+
+    /* --- EFECTOS VISUALES --- */
+    function createConfetti() {
+        for(let i=0;i<100;i++){
+            setTimeout(()=>{
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                const x = Math.random() * window.innerWidth;
+                const tx = (Math.random() - 0.5) * 200;
+                c.style.left = x + 'px';
+                c.style.top = '-10px';
+                c.style.backgroundColor = ['#ff595e','#1982c4','#6a4c93','#ffca3a','#8ac926'][Math.floor(Math.random()*5)];
+                c.style.setProperty('--tx', tx + 'px');
+                c.style.setProperty('--ty', window.innerHeight + 20 + 'px');
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 3000);
+            }, i * 20);
+        }
+    }
+
+    /* --- EVENTOS --- */
+    el('playBtn').onclick = startGame;
     
-    document.getElementById('muteBtn').onclick = toggleSound;
+    el('playWordBtn1').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const currentIdx = playOrder[playIndex];
+        if (currentGame !== 1 || currentIdx === undefined) return;
+        const currentWord = game1Targets[currentIdx].word;
+        if (!audioUnlocked) unlockAudio();
+        playWordAudio(currentWord, 0);
+    });
+
+    el('playWordBtn2').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const currentIdx = playOrder[playIndex];
+        if (currentGame !== 2 || currentIdx === undefined) return;
+        const currentWord = game2Targets[currentIdx].word;
+        if (!audioUnlocked) unlockAudio();
+        playWordAudio(currentWord, 0);
+    });
+
+    el('backToMenuBtn').onclick = () => { playSound('tap'); location.reload(); };
+    el('muteBtn').onclick = toggleSound;
+
+    // Resize listeners
+    window.addEventListener('resize', () => {
+        if(document.getElementById('gameScreen1').classList.contains('active')) {
+            refreshMarkersStyles(game1Targets, el('bodyImg1'));
+        }
+        if(document.getElementById('gameScreen2').classList.contains('active')) {
+            refreshMarkersStyles(game2Targets, el('bodyImg2'));
+        }
+    });
+
+    el('bodyImg1').addEventListener('load', () => { 
+        if(el('gameScreen1').classList.contains('active')){ 
+            placeMarkers(game1Targets, el('bodyImg1'), el('imgWrap1')); 
+        } 
+    });
+    
+    el('bodyImg2').addEventListener('load', () => { 
+        if(el('gameScreen2').classList.contains('active')){ 
+            placeMarkers(game2Targets, el('bodyImg2'), el('imgWrap2')); 
+        } 
+    });
 
     /* --- INIT --- */
     document.addEventListener('DOMContentLoaded', () => { loadHallOfFame(); });
